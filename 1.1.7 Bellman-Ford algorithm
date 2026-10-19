@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define INF 2e9 // Using a large value to represent infinity
+
+typedef struct {
+    int u, v, w;
+} Edge;
+
+void print_path(int parent[], int vertex, int src) {
+	int path[1005];
+	int count = 0;
+	int curr = vertex;
+
+
+	while (curr != -1) {
+			path[count++] = curr;
+			curr = parent[curr];
+		}
+
+
+	for (int i = count - 1; i >= 0; i--) {
+			printf("%d", path[i]);
+			if (i > 0) {
+						printf("->");
+					}
+		}
+}
+
+int main() {
+	int V, E;
+	if (scanf("%d %d", &V, &E) != 2) return 0;
+
+	Edge* edges = (Edge*)malloc(E * sizeof(Edge));
+	for (int i = 0; i < E; i++) {
+			scanf("%d %d %d", &edges[i].u, &edges[i].v, &edges[i].w);
+		}
+
+	int src;
+	scanf("%d", &src);
+
+
+	int* dist = (int*)malloc((V + 1) * sizeof(int));
+	int* parent = (int*)malloc((V + 1) * sizeof(int));
+
+	for (int i = 1; i <= V; i++) {
+			dist[i] = INF;
+			parent[i] = -1;
+		}
+	dist[src] = 0;
+
+
+	for (int i = 1; i <= V - 1; i++) {
+			for (int j = 0; j < E; j++) {
+						int u = edges[j].u;
+						int v = edges[j].v;
+						int w = edges[j].w;
+						if (dist[u] != INF && dist[u] + w < dist[v]) {
+										dist[v] = dist[u] + w;
+										parent[v] = u;
+									}
+					}
+		}
+
+
+	bool has_negative_cycle = false;
+	for (int j = 0; j < E; j++) {
+			int u = edges[j].u;
+			int v = edges[j].v;
+			int w = edges[j].w;
+			if (dist[u] != INF && dist[u] + w < dist[v]) {
+						has_negative_cycle = true;
+						break;
+					}
+		}
+
+	if (has_negative_cycle) {
+			printf("Negative cycle detected\n");
+		} else {
+
+			for (int v = 1; v <= V; v++) {
+						if (v == src) continue;
+
+						if (dist[v] == INF) {
+										printf("%d INF None\n", v);
+									} else {
+										printf("%d %d ", v, dist[v]);
+										print_path(parent, v, src);
+										printf("\n");
+									}
+					}
+		}
+
+
+	free(edges);
+	free(dist);
+	free(parent);
+
+	return 0;
+}
