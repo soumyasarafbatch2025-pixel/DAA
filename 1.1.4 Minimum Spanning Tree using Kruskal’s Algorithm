@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+
+
+void kruskalMST(int **cost, int V)
+{
+    int parent[100];
+
+    for (int i = 0; i < V; i++)
+        parent[i] = i;
+
+    int u[10000], v[10000], w[10000];
+    int e = 0;
+
+    // Store all edges
+    for (int i = 0; i < V; i++)
+    {
+        for (int j = i + 1; j < V; j++)
+        {
+            if (cost[i] [j] != 9999)
+            {
+                u[e] = i;
+                v[e] = j;
+                w[e] = cost[i][j];
+                e++;
+            }
+        }
+    }
+
+    // Bubble sort edges by weight
+    for (int i = 0; i < e - 1; i++)
+    {
+        for (int j = 0; j < e - i - 1; j++)
+        {
+            if (w[j] > w[j + 1])
+            {
+                int t;
+
+                t = w[j];
+                w[j] = w[j + 1];
+                w[j + 1] = t;
+
+                t = u[j];
+                u[j] = u[j + 1];
+                u[j + 1] = t;
+
+                t = v[j];
+                v[j] = v[j + 1];
+                v[j + 1] = t;
+            }
+        }
+    }
+
+    int count = 0;
+    int minCost = 0;
+
+    for (int i = 0; i < e && count < V - 1; i++)
+    {
+        int ru = u[i];
+        while (parent[ru] != ru)
+            ru = parent[ru];
+
+        int rv = v[i];
+        while (parent[rv] != rv)
+            rv = parent[rv];
+
+        if (ru != rv)
+        {
+            parent[ru] = rv;
+            printf("Edge %d:(%d, %d) cost:%d\n", count, u[i], v[i], w[i]);
+            minCost += w[i];
+            count++;
+        }
+    }
+
+printf("Minimum cost= %d\n", minCost);
+}
+int main() {
+    int V;
+    printf("No of vertices: ");
+    scanf("%d", &V);
+
+    int **cost = (int **)malloc(V * sizeof(int *));
+    for (int i = 0; i < V; i++)
+        cost[i] = (int *)malloc(V * sizeof(int));
+
+    printf("Adjacency matrix:\n");
+    for (int i = 0; i < V; i++)
+        for (int j = 0; j < V; j++)
+            scanf("%d", &cost[i][j]);
+
+    kruskalMST(cost, V);
+
+    for (int i = 0; i < V; i++)
+        free(cost[i]);
+    free(cost);
+
+    return 0;
+}
